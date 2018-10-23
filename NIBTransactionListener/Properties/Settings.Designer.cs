@@ -49,5 +49,14 @@ namespace NIBTransactionListener.Properties {
                 return ((string)(this["sources"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D,C,d,c")]
+        public string debitcredit {
+            get {
+                return ((string)(this["debitcredit"]));
+            }
+        }
     }
 }

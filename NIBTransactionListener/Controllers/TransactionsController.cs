@@ -71,8 +71,203 @@ namespace NIBTransactionListener.Controllers
 
                 NotififyEventResponse NIBResponse = new NotififyEventResponse();
 
-                // validates information received
+                bool parameterErrors = false;
+                string errordescription = " ";
 
+                // validates information received
+                // Sources
+                if (dataReceived.source == null || dataReceived.source.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing source";
+
+                }
+                else
+                {
+                    string[] strSources = null;
+                    char[] splitchar = { ',' };
+                    strSources = Properties.Settings.Default.sources.Split(splitchar);
+                    if (strSources.Count(x => x.Contains(dataReceived.source)) < 1)
+                    {
+                        parameterErrors = true;
+                        errordescription += " -- Invalid source";
+                    }
+                }
+
+                // pushid
+                if (dataReceived.pushid == null || dataReceived.pushid.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing pushid";
+                }
+
+                // transactionid
+                if (dataReceived.transactionid == null)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing transactionid";
+                }
+
+                // transactiondateTime  
+                if (dataReceived.transactiondateTime != null)
+                {
+                    if (validatenumbers(dataReceived.transactiondateTime))
+                    {
+                        try
+                        { 
+                        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(dataReceived.transactiondateTime));
+                        DateTime dateTime = dateTimeOffset.UtcDateTime;
+                        }
+                        catch (Exception ex1)
+                        {
+                            parameterErrors = true;
+                            errordescription += " -- Invalid transactiondateTime " + ex1.Message;
+                        }
+
+                    }
+                }
+                else
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing transactiondateTime";
+                }
+
+                //transactiontype
+                if (dataReceived.transactiontype == null || dataReceived.transactiontype.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing transactiontype";
+                }
+
+
+                //debitcredit
+                if (dataReceived.debitcredit == null || dataReceived.debitcredit.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing debitcredit";
+                }
+                else
+                {
+                    string[] strSources = null;
+                    char[] splitchar = { ',' };
+                    strSources = Properties.Settings.Default.debitcredit.Split(splitchar);
+                    if (strSources.Count(x => x.Contains(dataReceived.debitcredit)) < 1)
+                    {
+                        parameterErrors = true;
+                        errordescription += " -- Invalid debitcredit";
+                    }
+                }
+
+                // amount
+                if (dataReceived.amount == null || dataReceived.amount.Length < 1)
+                {
+                        parameterErrors = true;
+                        errordescription += " -- Missing amount";
+                }
+                else
+                {
+                    if (!validatenumbers(dataReceived.amount))
+                    {
+                            parameterErrors = true;
+                            errordescription += " -- Invalid validatenumbers";
+                    }
+                }
+
+                //currency
+                if (dataReceived.currency == null || dataReceived.currency.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing currency";
+                }
+                else
+                {
+                    if (validatecurrency(dataReceived.currency) < 1)
+                    {
+                        parameterErrors = true;
+                        errordescription += " -- Invalid currency";
+                    }
+                }
+
+                // status
+                if (dataReceived.status == null || dataReceived.status.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing status";
+                }
+
+                //accountnumber
+                if (dataReceived.accountnumber == null || dataReceived.accountnumber.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountnumber";
+                }
+
+                // customerid
+                if (dataReceived.customerid == null || dataReceived.customerid.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing customerid";
+                }
+
+                //accountHolderfirstname
+                if (dataReceived.accountholderfirstname == null || dataReceived.accountholderfirstname.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountholderfirstname";
+                }
+
+                // accountholderaddressl1
+                if (dataReceived.accountholderaddressl1 == null || dataReceived.accountholderaddressl1.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountholderaddressl1";
+                }
+
+                // accountHoldercity
+                if (dataReceived.accountholdercity == null || dataReceived.accountholdercity.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountholdercity";
+                }
+
+                // accountHolderstate
+                if (dataReceived.accountholderstate == null || dataReceived.accountholderstate.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountholderstate";
+                }
+
+                // accountHolderpostalcode
+                if (dataReceived.accountholderpostalcode == null || dataReceived.accountholderpostalcode.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountholderpostalcode";
+                }
+
+                // accountHoldercountrycode
+
+                if (dataReceived.accountholdercountrycode == null || dataReceived.accountholdercountrycode.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountholdercountrycode";
+                }
+                else
+                {
+                    if (validatecountrycode(dataReceived.accountholdercountrycode) < 1)
+                    {
+                        parameterErrors = true;
+                        errordescription += " -- Invalid accountholdercountrycode";
+                    }
+                }
+
+                // accountHolderphonenumber
+                if (dataReceived.accountholderphonenumber == null || dataReceived.accountholderphonenumber.Length < 1)
+                {
+                    parameterErrors = true;
+                    errordescription += " -- Missing accountholderphonenumber";
+                }
+
+                // 
 
 
 
@@ -80,8 +275,18 @@ namespace NIBTransactionListener.Controllers
                 Random rnd = new Random();
                 int single = rnd.Next(1, 10);
                 NIBResponse.NotificationEventId = rnd.Next(1, 99999999).ToString();
-                NIBResponse.ResponseCode = "00";
-                NIBResponse.ResponseDescription = "Transaction was processed successfully";
+
+                if (parameterErrors)
+                {
+                            NIBResponse.ResponseCode = "12";
+                            NIBResponse.ResponseDescription = errordescription;
+
+                }
+                else
+                {                
+                            NIBResponse.ResponseCode = "00";
+                            NIBResponse.ResponseDescription = "Transaction was processed successfully";
+                }
                 MemoryStream ms = new MemoryStream();
                 DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(NotififyEventResponse));
                 ser.WriteObject(ms, NIBResponse);
@@ -400,7 +605,7 @@ namespace NIBTransactionListener.Controllers
                 }
             }
             [System.Xml.Serialization.XmlElementAttribute(Order = 22)]
-            public string accountholderaddressL1
+            public string accountholderaddressl1
             {
                 get
                 {
