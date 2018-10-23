@@ -11,6 +11,8 @@ using System.Web.Http;
 using Newtonsoft.Json;
 using NIBTransactionListener.Filters;
 using NIBTransactionListener.Models;
+using System.Globalization;
+
 
 namespace NIBTransactionListener.Controllers
 {
@@ -60,39 +62,40 @@ namespace NIBTransactionListener.Controllers
             //	"accountHolderemailaddress" : "JBARRIOS@NIBANK.COM"
             //}
 
-            var bodyStream = new StreamReader(HttpContext.Current.Request.InputStream);
-            bodyStream.BaseStream.Seek(0, SeekOrigin.Begin);
-            string bodyText = bodyStream.ReadToEnd();
+            try
+            {
+                var bodyStream = new StreamReader(HttpContext.Current.Request.InputStream);
+                bodyStream.BaseStream.Seek(0, SeekOrigin.Begin);
+                string bodyText = bodyStream.ReadToEnd();
+                NotifyEvent dataReceived = JsonConvert.DeserializeObject<NotifyEvent>(bodyText);
 
-            NotifyEvent dataResponse = JsonConvert.DeserializeObject<NotifyEvent>(bodyText);
+                NotififyEventResponse NIBResponse = new NotififyEventResponse();
 
-            NotififyEventResponse NIBResponse = new NotififyEventResponse();
-
-            Random rnd = new Random();
-            int single = rnd.Next(1, 10);
-            NIBResponse.NotificationEventId = rnd.Next(1, 99999999).ToString();
-            NIBResponse.ResponseCode = "00";
-            NIBResponse.ResponseDescription = "Transaction was processed successfully";
-
-            //Create a stream to serialize the object to.  
-            MemoryStream ms = new MemoryStream();
-
-            // Serializer the User object to the stream.  
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(NotififyEventResponse));
-            ser.WriteObject(ms, NIBResponse);
-            byte[] json = ms.ToArray();
-            ms.Close();
-            return Encoding.UTF8.GetString(json, 0, json.Length);
+                // validates information received
 
 
 
 
 
-            //MemoryStream stream1 = new MemoryStream();
-            //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(NotififyEventResponse));
-            //ser.WriteObject(stream1, NIBResponse);
-            //StreamReader sr = new StreamReader(stream1);
-            //return sr.ReadToEnd();
+                Random rnd = new Random();
+                int single = rnd.Next(1, 10);
+                NIBResponse.NotificationEventId = rnd.Next(1, 99999999).ToString();
+                NIBResponse.ResponseCode = "00";
+                NIBResponse.ResponseDescription = "Transaction was processed successfully";
+                MemoryStream ms = new MemoryStream();
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(NotififyEventResponse));
+                ser.WriteObject(ms, NIBResponse);
+                byte[] json = ms.ToArray();
+                ms.Close();
+                return Encoding.UTF8.GetString(json, 0, json.Length);
+
+            }
+            catch (Exception ex)
+            {
+                return ex.Message; 
+            }
+
+
 
 
 
@@ -497,7 +500,6 @@ namespace NIBTransactionListener.Controllers
     
 
 
-
         public partial class NotififyEventResponse
         {
             private string ResponseCodeField;
@@ -543,5 +545,32 @@ namespace NIBTransactionListener.Controllers
     }
 
 
-}
+        public int validatecurrency(string currency)
+        {
+            IEnumerable<string> currencySymbols = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+            .Select(x => (new RegionInfo(x.LCID)).ISOCurrencySymbol)
+            .Distinct()
+            .OrderBy(x => x);
+
+            return currencySymbols.Count(x => x.Contains(currency));
+        }
+
+
+        public int validatecountrycode(string country)
+        {
+            IEnumerable<string> currencySymbols = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+            .Select(x => (new RegionInfo(x.LCID)).TwoLetterISORegionName)
+            .Distinct()
+            .OrderBy(x => x);
+
+            return currencySymbols.Count(x => x.Contains(country));
+        }
+
+
+        public bool validatenumbers(string number)
+        {
+            return double.TryParse(number, out double n);
+        }
+
+    }
 }

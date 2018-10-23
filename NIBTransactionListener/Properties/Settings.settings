@@ -8,5 +8,8 @@
     <Setting Name="password" Type="System.String" Scope="Application">
       <Value Profile="(Default)">AmmWgf8CKuZD2ODjp8FvgnFbP6ZSlMnOaIOIZr2olDqW</Value>
     </Setting>
+    <Setting Name="sources" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">corebanking,creditcard,swift</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
