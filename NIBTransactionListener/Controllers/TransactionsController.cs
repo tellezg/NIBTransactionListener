@@ -12,7 +12,8 @@ using Newtonsoft.Json;
 using NIBTransactionListener.Filters;
 using NIBTransactionListener.Models;
 using System.Globalization;
-
+using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace NIBTransactionListener.Controllers
 {
@@ -20,48 +21,8 @@ namespace NIBTransactionListener.Controllers
     public class TransactionsController : ApiController
     {
         // POST api/values
-        public string Post([FromBody]string value)
+        public JObject Post([FromBody]string value)
         {
-
-            //            {
-            //                "source" : "LASistemas",
-            //	"userid": "RXkaCz2ENI",
-            //	"userpassword": "NRUewd1gwKiLj92" ,
-            //	"pushid" : 112414 ,
-
-
-            //	"transactionid": "A455414",
-            //	"transactiondateTime": "",
-            //	"transactiontype": "Deposit",
-            //	"debitcredit": "C",
-            //	"amount": 1506.05,
-            //	"currency": "USD",
-            //	"status": "APPROVED",
-            //	"authorizationid": "5987101",
-            //	"originalTransid": "0",
-
-
-            //	"accountnumber": "01054906",
-            //	"accounttype": "CHECKING",
-            //	"description": "DEPOSIT VIA WIRE TRANSFER",
-            //	"reference": "A-89774412-4414",
-            //	"accountholderteference": "PAYROLL",
-
-
-            //	"customerid": "778441541",
-            //	"availablebalance": 3578.36,
-            //	"accountHolderfirstname": "JOANTHAN",
-            //	"accountHolderlastname": "BARRIOS",
-            //	"accountHolderaddressL1": "CALLE 122 # 14-98",
-            //	"accountHolderaddressl2": "APTO 204",
-            //	"accountHoldercity": "BOGOTA",
-            //	"accountHolderstate": "DC",
-            //	"accountHolderpostalcode": "10010",
-            //	"accountHoldercountrycode": "CO",
-            //	"accountHolderphonenumber": "573102088821",
-            //	"accountHolderemailaddress" : "JBARRIOS@NIBANK.COM"
-            //}
-
             try
             {
                 var bodyStream = new StreamReader(HttpContext.Current.Request.InputStream);
@@ -287,17 +248,32 @@ namespace NIBTransactionListener.Controllers
                             NIBResponse.ResponseCode = "00";
                             NIBResponse.ResponseDescription = "Transaction was processed successfully";
                 }
-                MemoryStream ms = new MemoryStream();
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(NotififyEventResponse));
-                ser.WriteObject(ms, NIBResponse);
-                byte[] json = ms.ToArray();
-                ms.Close();
-                return Encoding.UTF8.GetString(json, 0, json.Length);
+   
+          
+                return JObject.Parse(JsonConvert.SerializeObject(NIBResponse, Formatting.None)); 
+      
+
+
+
+
+
+
+
+
+
 
             }
             catch (Exception ex)
             {
-                return ex.Message; 
+                NotififyEventResponse NIBResponse = new NotififyEventResponse();
+                Random rnd = new Random();
+                int single = rnd.Next(1, 10);
+                NIBResponse.NotificationEventId = rnd.Next(1, 99999999).ToString();
+                NIBResponse.ResponseCode = "99";
+                NIBResponse.ResponseDescription = ex.Message;
+                var jsonString = JsonConvert.SerializeObject(NIBResponse, Formatting.None);
+                var myCleanJsonObject = JObject.Parse(jsonString);
+                return myCleanJsonObject;
             }
 
 
